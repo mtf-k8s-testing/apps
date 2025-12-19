@@ -4,7 +4,7 @@ metadata:
   name: app-deployment
   namespace: dev-01
 spec:
-  replicas: 0
+  replicas: 1
   revisionHistoryLimit: 3
   selector:
     matchLabels:
