@@ -3,15 +3,20 @@ kind: Ingress
 metadata:
   name: app-ingress
   namespace: dev-01
-  annotations:
-    konghq.com/strip-path: 'true'
 spec:
   ingressClassName: kong
   rules:
     - http:
         paths:
-          - path: /
-            pathType: Prefix
+          - path: /same
+            pathType: Exact
+            backend:
+              service:
+                name: app-svc
+                port:
+                  number: 3000
+          - path: /ingress
+            pathType: Exact
             backend:
               service:
                 name: app-svc

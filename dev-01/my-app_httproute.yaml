@@ -3,8 +3,6 @@ kind: HTTPRoute
 metadata:
   name: app-httproute
   namespace: dev-01
-  annotations:
-    konghq.com/strip-path: 'true'
 spec:
   parentRefs:
     - name: gw
@@ -12,8 +10,21 @@ spec:
   rules:
     - matches:
         - path:
-            type: PathPrefix
-            value: /
+            type: Exact
+            value: /same
+      filters:
+        - type: ResponseHeaderModifier
+          responseHeaderModifier:
+            add:
+              - name: gateway-api
+                value: 'true'
+      backendRefs:
+        - name: app-svc
+          port: 3000
+    - matches:
+        - path:
+            type: Exact
+            value: /gw
       filters:
         - type: ResponseHeaderModifier
           responseHeaderModifier:
