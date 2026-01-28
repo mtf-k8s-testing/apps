@@ -38,8 +38,8 @@ spec:
           port: 3000
     - matches:
         - path:
-          type: Exact
-          value: /hang
+            type: Exact
+            value: /hang
       backendRefs:
         - name: app-svc
           port: 3000
