@@ -19,7 +19,7 @@ spec:
     spec:
       containers:
         - name: app
-          imagePullPolicy: IfNotPresent
+          imagePullPolicy: Always
           image: ghcr.io/mtf-k8s-testing/example-app:v1
           ports:
             - name: http
