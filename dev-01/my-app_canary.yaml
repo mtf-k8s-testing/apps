@@ -33,9 +33,11 @@ spec:
   #  apiVersion: autoscaling/v2
   #  kind: HorizontalPodAutoscaler
   #  name: app-hpa
+provider: apigateway:v1
   service:
     port: 80
-    portDiscovery: true
+    targetPort: 3000
+    portDiscovery: false
     match:
       - uri:
           prefix: /foobar
