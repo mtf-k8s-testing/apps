@@ -1,0 +1,78 @@
+apiVersion: flagger.app/v1beta1
+kind: MetricTemplate
+metadata:
+  name: request-success-rate-custom
+  namespace: flagger-system
+spec:
+  provider:
+    type: prometheus
+    address: http://promethius-prometheus-server.monitoring.svc.cluster.local
+  query: |
+    avg(avg_over_time(request_success_rate{
+                namespace="{{ namespace }}",
+                pod=~"{{ target }}-[0-9a-zA-Z]+(-[0-9a-zA-Z]+)"
+    }[10s]))
+---
+apiVersion: flagger.app/v1beta1
+kind: Canary
+metadata:
+  name: app-canary
+  namespace: dev-01
+spec:
+  provider: kubernetes
+  # deployment reference
+  targetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: app-deployment
+  # the maximum time in seconds for the canary deployment
+  # to make progress before rollback (default 600s)
+  progressDeadlineSeconds: 60
+  # HPA reference (optional)
+  #autoscalerRef:
+  #  apiVersion: autoscaling/v2
+  #  kind: HorizontalPodAutoscaler
+  #  name: app-hpa
+  service:
+    port: 3000
+    portDiscovery: true
+    match:
+      - uri:
+          prefix: /foobar
+    rewrite:
+      uri: /
+  analysis:
+    # schedule interval (default 60s)
+    interval: 10s
+    # max number of failed checks before rollback
+    threshold: 3
+    # number of checks to run before rollback
+    iterations: 10
+    # Prometheus checks based on http_request_duration_seconds histogram
+    metrics:
+      - name: "success rate"
+        templateRef:
+          name: request-success-rate-custom
+          namespace: flagger-system
+        thresholdRange:
+          min: 99
+        interval: 10s
+    # acceptance/load testing hooks
+    webhooks:
+        # rollout webhook triggers at teh same time the metrics checks happen,
+        # so if your metrics depend on load, you must *also* generate load in
+        # pre-rollout
+      - name: load-test-pre
+        type: pre-rollout
+        url: http://flagger-loadtester.default/
+        timeout: 5s
+        metadata:
+          type: cmd
+          cmd: "hey -z 10s -q 10 -c 2 http://app-deployment-canary.test:3000/"
+      - name: load-test
+        type: rollout
+        url: http://flagger-loadtester.default/
+        timeout: 5s
+        metadata:
+          type: cmd
+          cmd: "hey -z 10s -q 10 -c 2 http://app-deployment-canary.test:3000/"

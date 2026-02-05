@@ -4,7 +4,7 @@ metadata:
   name: app-deployment
   namespace: dev-01
 spec:
-  replicas: 1
+  replicas: 0
   revisionHistoryLimit: 3
   selector:
     matchLabels:
@@ -20,7 +20,7 @@ spec:
       containers:
         - name: app
           imagePullPolicy: Always
-          image: ghcr.io/mtf-k8s-testing/example-app:v1
+          image: ghcr.io/mtf-k8s-testing/example-app:latest
           ports:
             - name: http
               containerPort: 3000
