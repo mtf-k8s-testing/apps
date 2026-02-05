@@ -34,13 +34,18 @@ spec:
   #  kind: HorizontalPodAutoscaler
   #  name: app-hpa
   service:
-    port: 3000
+    port: 80
     portDiscovery: true
     match:
       - uri:
           prefix: /foobar
     rewrite:
       uri: /
+    hosts:
+      - www.example.com
+    gatewayRefs:
+    - name: kong-gateway
+      namespace: kong
   analysis:
     # schedule interval (default 60s)
     interval: 10s
