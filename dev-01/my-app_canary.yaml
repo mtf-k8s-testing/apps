@@ -19,7 +19,6 @@ metadata:
   name: app-canary
   namespace: dev-01
 spec:
-  provider: kubernetes
   # deployment reference
   targetRef:
     apiVersion: apps/v1
