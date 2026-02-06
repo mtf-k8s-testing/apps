@@ -41,8 +41,6 @@ spec:
           prefix: /foobar
     rewrite:
       uri: /
-    hosts:
-      - www.example.com
     gatewayRefs:
     - name: kong-gateway
       namespace: kong
@@ -51,8 +49,8 @@ spec:
     interval: 10s
     # max number of failed checks before rollback
     threshold: 3
-    # number of checks to run before rollback
-    iterations: 10
+    stepWeight: 10
+    maxWeight: 90
     # Prometheus checks based on http_request_duration_seconds histogram
     metrics:
       - name: "success rate"
